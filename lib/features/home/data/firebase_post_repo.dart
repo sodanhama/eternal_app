@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:eternal_app/features/home/domain/entities/comment.dart';
 import 'package:eternal_app/features/home/domain/entities/post.dart';
 import 'package:eternal_app/features/home/domain/repos/post_repo.dart';
 
@@ -21,4 +22,27 @@ class FirebasePostRepo implements PostRepo {
     return snapshot.docs.map((doc) => Post.fromJson(doc.data())).toList();
   }
   
+  @override
+  Future<void> addComment(Comment comment) async {
+    await _firestore.collection('posts').doc(comment.postId).collection('comments').doc(comment.id)
+    .set(comment.toJson());
+  }
+
+  @override
+  Future<void> deleteComment(String postId, String commentId) async {
+    await _firestore.collection('posts').doc(postId).collection('comments').doc(commentId)
+    .delete();
+
+  }
+
+  @override
+  Future<List<Comment>> getComments(String postId) async {
+    final snapshot = await _firestore.collection('posts').doc(postId).collection('comments')
+    .orderBy('id', descending: false)
+    .get();
+
+    final commentsForThisPost = snapshot.docs.map((doc)=>Comment.fromJson(doc.data())).toList();
+
+    return commentsForThisPost;
+  }
 }

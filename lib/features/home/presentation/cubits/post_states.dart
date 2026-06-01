@@ -8,7 +8,8 @@ class PostLoading extends PostState {}
 
 class PostsLoaded extends PostState { 
   final List<Post> posts;
-  PostsLoaded(this.posts);
+  final Map<String,int> commentCounts;
+  PostsLoaded(this.posts, {required this.commentCounts});
 }
 
 class PostError extends PostState {

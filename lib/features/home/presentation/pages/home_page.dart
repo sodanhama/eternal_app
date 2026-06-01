@@ -5,6 +5,7 @@ import 'package:eternal_app/features/home/domain/entities/post.dart';
 import 'package:eternal_app/features/home/presentation/components/post_tile.dart';
 import 'package:eternal_app/features/home/presentation/cubits/post_cubit.dart';
 import 'package:eternal_app/features/home/presentation/cubits/post_states.dart';
+import 'package:eternal_app/features/home/presentation/pages/post_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -118,12 +119,21 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
       return const Center(child: Text("No posts here yet!"));
     }
 
-    return ListView.builder(
+    return ListView.separated(
       itemCount: postsInThisCategory.length,
-      itemBuilder: (contex, index) {
+      separatorBuilder: (context, index) => Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+        child: Divider(
+          color: Theme.of(context).colorScheme.tertiary,
+        ),
+      ),
+      itemBuilder: (context, index) {
         final post = postsInThisCategory[index];
 
-        return PostTile(post: post, onDelete: () => deletePost(post.id),);
+        return PostTile(post: post, onDelete: () => deletePost(post.id),
+        onTap: () {
+          Navigator.push(context, MaterialPageRoute(builder: (context) => PostPage(post: post),),);
+        });
       }
     );
   }
