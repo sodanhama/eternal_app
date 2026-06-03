@@ -121,11 +121,9 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
 
     return ListView.separated(
       itemCount: postsInThisCategory.length,
-      separatorBuilder: (context, index) => Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16.0),
-        child: Divider(
-          color: Theme.of(context).colorScheme.tertiary,
-        ),
+      separatorBuilder: (context, index) => Divider(
+        indent: 16, endIndent: 16,
+        color: Theme.of(context).colorScheme.tertiary,
       ),
       itemBuilder: (context, index) {
         final post = postsInThisCategory[index];
