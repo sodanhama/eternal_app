@@ -2,6 +2,7 @@ import 'package:eternal_app/features/auth/presentation/components/my_textfield.d
 import 'package:eternal_app/features/auth/presentation/cubits/auth_cubit.dart';
 import 'package:eternal_app/features/home/domain/entities/comment.dart';
 import 'package:eternal_app/features/home/domain/entities/post.dart';
+import 'package:eternal_app/features/home/presentation/components/comment_tile.dart';
 import 'package:eternal_app/features/home/presentation/components/post_tile.dart';
 import 'package:eternal_app/features/home/presentation/cubits/post_cubit.dart';
 import 'package:flutter/material.dart';
@@ -155,6 +156,7 @@ class _PostPageState extends State<PostPage> {
             children: [
               PostTile(
                 post: widget.post,
+                commentCount: _comments.length,
                 onDelete: () {},
                 onTap: () {},
               ),
@@ -173,7 +175,10 @@ class _PostPageState extends State<PostPage> {
                   itemBuilder: (context, index) {
                     final comment = _comments[index];
 
-                    return Text(comment.text);
+                    return CommentTile(
+                      comment: comment,
+                      onDelete: () => _showDeleteCommentBox(comment.id),
+                    );
                   }
                 )
 

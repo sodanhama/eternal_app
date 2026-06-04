@@ -112,7 +112,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
 
   }
 
-  Widget _buildCategoryPosts(String category, List<Post> posts) {
+  Widget _buildCategoryPosts(String category, List<Post> posts, Map<String, int> commentCounts) {
     final postsInThisCategory = posts.where((post) => post.category == category).toList();
 
     if (postsInThisCategory.isEmpty) {
@@ -128,7 +128,10 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
       itemBuilder: (context, index) {
         final post = postsInThisCategory[index];
 
+        final commentCount = commentCounts[post.id] ?? 0;
+
         return PostTile(post: post, onDelete: () => deletePost(post.id),
+        commentCount: commentCount,
         onTap: () {
           Navigator.push(context, MaterialPageRoute(builder: (context) => PostPage(post: post),),);
         });
@@ -140,7 +143,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-            title:Text("Home"),
+            title:const Text("Home"),
 
             bottom: TabBar(
               controller: _tabController,
@@ -167,9 +170,9 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
             return TabBarView(
               controller: _tabController,
               children: [
-                _buildCategoryPosts("Create", state.posts),
-                _buildCategoryPosts("Publish", state.posts),
-                _buildCategoryPosts("Earn", state.posts)
+                _buildCategoryPosts("Create", state.posts, state.commentCounts),
+                _buildCategoryPosts("Publish", state.posts, state.commentCounts),
+                _buildCategoryPosts("Earn", state.posts, state.commentCounts)
               ],
             );
 

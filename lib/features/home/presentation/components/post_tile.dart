@@ -1,5 +1,7 @@
+import 'package:eternal_app/features/auth/presentation/cubits/auth_cubit.dart';
 import 'package:eternal_app/features/home/domain/entities/post.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class PostTile extends StatelessWidget {
   final Post post;
@@ -17,6 +19,10 @@ class PostTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final authCubit = context.read<AuthCubit>();
+    final String currentUsername = authCubit.currentUser?.email ?? '';
+
+    final bool canDelete = (post.username == currentUsername); 
     return InkWell(
       onTap: onTap,
       child: Padding(
@@ -34,7 +40,7 @@ class PostTile extends StatelessWidget {
               )
               ),
         
-              
+            if (canDelete)
               GestureDetector(
                 onTap: onDelete,
                 child: Icon(Icons.cancel, color: Theme.of(context).colorScheme.primary)
