@@ -18,23 +18,24 @@ class CommentTile extends StatelessWidget {
     final bool canDelete = (comment.username == currentUsername); 
 
     return Container(
-      child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-        Expanded(
-          child: Row(
+      child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+
             children: [
             Text(comment.text),
-            Text(comment.username)
-          ],),
-        ),
-
-
-
-        if (canDelete)
+                    if (canDelete)
           IconButton(
             onPressed: onDelete,
             icon: Icon(Icons.delete),
-          )
-      ])
-    );
+          ),
+            Text(comment.username),
+
+
+          ],),
+        
+
+
+
+      );
   }
 }

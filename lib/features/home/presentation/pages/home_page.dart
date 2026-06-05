@@ -151,9 +151,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
               labelColor: Theme.of(context).colorScheme.inversePrimary,
               unselectedLabelColor: Theme.of(context).colorScheme.primary,
               tabs: const [
-                Tab(text: "Create"),
-                Tab(text:"Publish"),
-                Tab(text:"Earn")
+                Tab(text: "Posts"),
               ]
             ),
             actions: [
