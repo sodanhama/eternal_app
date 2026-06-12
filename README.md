@@ -8,9 +8,13 @@ It features a login page, a signup page, a home page, settings, profile, and the
 
 I used Firebase for authentication.
 
+I have implemented the ability to add and delete comments, and the crucial feature of being able to delete your account.
+
 Download it here: https://github.com/sodanhama/eternal_app/releases/tag/app
 
 ![Screenshot](https://cdn.hackclub.com/019ebb32-2247-7212-82b6-bb51ebf6de61/pasted_2026-06-12_at_3.05.31_pm.tiff)
 
 Demo: https://cdn.hackclub.com/019ebb36-b490-7d9f-bf88-46213755a5ae/screen_recording_2026-06-12_at_3.09.30___pm.mp4
 
+## AI Usage
+I used AI to fix a few errors (in the home page).
