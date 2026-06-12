@@ -16,17 +16,23 @@ class HomePage extends StatefulWidget {
   State<HomePage> createState() => _HomePageState();
 }
 
+class _HomePageState extends State<HomePage>
+    with SingleTickerProviderStateMixin {
+  // ✅ length matches the 3 Tab widgets below
+  late final _tabController = TabController(length: 3, vsync: this);
 
-class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin {
-  late final _tabController = TabController(length:3, vsync: this);
-  
   late final postCubit = context.read<PostCubit>();
-  
+
   @override
   void initState() {
     super.initState();
-
     postCubit.loadPosts();
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
   }
 
   void addPost() {
@@ -44,6 +50,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
       default:
         currentCategory = "Create";
     }
+
     final titleController = TextEditingController();
     final contentController = TextEditingController();
 
@@ -52,39 +59,44 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
       builder: (context) => AlertDialog(
         title: const Text("New Post"),
         content: Column(
+          mainAxisSize: MainAxisSize.min,
           children: [
             MyTextField(
               controller: titleController,
               hintText: "Title",
-              obscureText: false),
-              const SizedBox(height: 16),
-
+              obscureText: false,
+            ),
+            const SizedBox(height: 16),
             MyTextField(
-              controller: contentController, 
+              controller: contentController,
               hintText: "Content",
-              obscureText: false, 
-            )
-          ]
+              obscureText: false,
+            ),
+          ],
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text("Cancel")),
-          TextButton(onPressed: () {
-            if (titleController.text.isNotEmpty) {
-              final postCubit = context.read<PostCubit>();
-              final authCubit = context.read<AuthCubit>();
-              postCubit.createPost(
-                title: titleController.text,
-                content: contentController.text,
-                category: currentCategory,
-                username: authCubit.currentUser!.email // Replace with actual username
-              );
-
-              Navigator.pop(context); 
-              
-            }
-          }, child: const Text("Post"))
-        ]
-      )
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text("Cancel"),
+          ),
+          TextButton(
+            onPressed: () {
+              if (titleController.text.isNotEmpty) {
+                final postCubit = context.read<PostCubit>();
+                final authCubit = context.read<AuthCubit>();
+                postCubit.createPost(
+                  title: titleController.text,
+                  content: contentController.text,
+                  category: currentCategory,
+                  username: authCubit.currentUser!.email,
+                );
+                Navigator.pop(context);
+              }
+            },
+            child: const Text("Post"),
+          ),
+        ],
+      ),
     );
   }
 
@@ -96,7 +108,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text("Cancel")
+            child: const Text("Cancel"),
           ),
           TextButton(
             onPressed: () {
@@ -104,16 +116,19 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
               Navigator.pop(context);
             },
             child: const Text("Delete"),
-          )
-        ]
-
-      )
+          ),
+        ],
+      ),
     );
-
   }
 
-  Widget _buildCategoryPosts(String category, List<Post> posts, Map<String, int> commentCounts) {
-    final postsInThisCategory = posts.where((post) => post.category == category).toList();
+  Widget _buildCategoryPosts(
+    String category,
+    List<Post> posts,
+    Map<String, int> commentCounts,
+  ) {
+    final postsInThisCategory =
+        posts.where((post) => post.category == category).toList();
 
     if (postsInThisCategory.isEmpty) {
       return const Center(child: Text("No posts here yet!"));
@@ -122,60 +137,69 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
     return ListView.separated(
       itemCount: postsInThisCategory.length,
       separatorBuilder: (context, index) => Divider(
-        indent: 16, endIndent: 16,
+        indent: 16,
+        endIndent: 16,
         color: Theme.of(context).colorScheme.tertiary,
       ),
       itemBuilder: (context, index) {
         final post = postsInThisCategory[index];
-
         final commentCount = commentCounts[post.id] ?? 0;
 
-        return PostTile(post: post, onDelete: () => deletePost(post.id),
-        commentCount: commentCount,
-        onTap: () {
-          Navigator.push(context, MaterialPageRoute(builder: (context) => PostPage(post: post),),);
-        });
-      }
+        return PostTile(
+          post: post,
+          onDelete: () => deletePost(post.id),
+          commentCount: commentCount,
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => PostPage(post: post)),
+            );
+          },
+        );
+      },
     );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-            title:const Text("Home"),
-
-            bottom: TabBar(
-              controller: _tabController,
-              dividerColor: Colors.transparent,
-              labelColor: Theme.of(context).colorScheme.inversePrimary,
-              unselectedLabelColor: Theme.of(context).colorScheme.primary,
-              tabs: const [
-                Tab(text: "Posts"),
-              ]
-            ),
-            actions: [
-              IconButton(onPressed: addPost ,
-              icon: const Icon(Icons.add),
-              )
-            ]
-
+      appBar: AppBar(
+        title: const Text("Home"),
+        bottom: TabBar(
+          controller: _tabController,
+          // ✅ 3 tabs to match TabController length: 3
+          tabs: const [
+            Tab(text: "Create"),
+            Tab(text: "Publish"),
+            Tab(text: "Earn"),
+          ],
+          labelColor: Theme.of(context).colorScheme.inversePrimary,
+          unselectedLabelColor: Theme.of(context).colorScheme.primary,
         ),
-        drawer: MyDrawer(),
-
-        body: BlocBuilder<PostCubit, PostState>(builder: (context, state) {
+        actions: [
+          IconButton(
+            onPressed: addPost,
+            icon: const Icon(Icons.add),
+          ),
+        ],
+      ),
+      drawer: const MyDrawer(),
+      body: BlocBuilder<PostCubit, PostState>(
+        builder: (context, state) {
           if (state is PostsLoaded) {
             return TabBarView(
               controller: _tabController,
               children: [
-                _buildCategoryPosts("Create", state.posts, state.commentCounts),
-                _buildCategoryPosts("Publish", state.posts, state.commentCounts),
-                _buildCategoryPosts("Earn", state.posts, state.commentCounts)
+                _buildCategoryPosts(
+                    "Create", state.posts, state.commentCounts),
+                _buildCategoryPosts(
+                    "Publish", state.posts, state.commentCounts),
+                _buildCategoryPosts(
+                    "Earn", state.posts, state.commentCounts),
               ],
             );
-
-
           }
+
           if (state is PostLoading) {
             return const Center(child: CircularProgressIndicator());
           }
@@ -185,7 +209,8 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
           }
 
           return const SizedBox();
-
-        },),);
+        },
+      ),
+    );
   }
 }
