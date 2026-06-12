@@ -12,7 +12,5 @@ Download it here: https://github.com/sodanhama/eternal_app/releases/tag/app
 
 ![Screenshot](https://cdn.hackclub.com/019ebb32-2247-7212-82b6-bb51ebf6de61/pasted_2026-06-12_at_3.05.31_pm.tiff)
 
-<video width="640" height="360" controls>
-  <source src="https://cdn.hackclub.com/019ebb36-b490-7d9f-bf88-46213755a5ae/screen_recording_2026-06-12_at_3.09.30___pm.mp4" type="video/mp4">
-  Your browser does not support the video tag.
-</video>
+Demo: https://cdn.hackclub.com/019ebb36-b490-7d9f-bf88-46213755a5ae/screen_recording_2026-06-12_at_3.09.30___pm.mp4
+
