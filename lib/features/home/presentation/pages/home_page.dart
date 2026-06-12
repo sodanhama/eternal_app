@@ -8,52 +8,27 @@ import 'package:eternal_app/features/home/presentation/cubits/post_states.dart';
 import 'package:eternal_app/features/home/presentation/pages/post_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-
+ 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
-
+ 
   @override
   State<HomePage> createState() => _HomePageState();
 }
-
-class _HomePageState extends State<HomePage>
-    with SingleTickerProviderStateMixin {
-  // ✅ length matches the 3 Tab widgets below
-  late final _tabController = TabController(length: 3, vsync: this);
-
+ 
+class _HomePageState extends State<HomePage> {
   late final postCubit = context.read<PostCubit>();
-
+ 
   @override
   void initState() {
     super.initState();
     postCubit.loadPosts();
   }
-
-  @override
-  void dispose() {
-    _tabController.dispose();
-    super.dispose();
-  }
-
+ 
   void addPost() {
-    String currentCategory;
-    switch (_tabController.index) {
-      case 0:
-        currentCategory = "Create";
-        break;
-      case 1:
-        currentCategory = "Publish";
-        break;
-      case 2:
-        currentCategory = "Earn";
-        break;
-      default:
-        currentCategory = "Create";
-    }
-
     final titleController = TextEditingController();
     final contentController = TextEditingController();
-
+ 
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -82,12 +57,11 @@ class _HomePageState extends State<HomePage>
           TextButton(
             onPressed: () {
               if (titleController.text.isNotEmpty) {
-                final postCubit = context.read<PostCubit>();
                 final authCubit = context.read<AuthCubit>();
                 postCubit.createPost(
                   title: titleController.text,
                   content: contentController.text,
-                  category: currentCategory,
+                  category: "General",
                   username: authCubit.currentUser!.email,
                 );
                 Navigator.pop(context);
@@ -99,7 +73,7 @@ class _HomePageState extends State<HomePage>
       ),
     );
   }
-
+ 
   void deletePost(String id) {
     showDialog(
       context: context,
@@ -121,61 +95,12 @@ class _HomePageState extends State<HomePage>
       ),
     );
   }
-
-  Widget _buildCategoryPosts(
-    String category,
-    List<Post> posts,
-    Map<String, int> commentCounts,
-  ) {
-    final postsInThisCategory =
-        posts.where((post) => post.category == category).toList();
-
-    if (postsInThisCategory.isEmpty) {
-      return const Center(child: Text("No posts here yet!"));
-    }
-
-    return ListView.separated(
-      itemCount: postsInThisCategory.length,
-      separatorBuilder: (context, index) => Divider(
-        indent: 16,
-        endIndent: 16,
-        color: Theme.of(context).colorScheme.tertiary,
-      ),
-      itemBuilder: (context, index) {
-        final post = postsInThisCategory[index];
-        final commentCount = commentCounts[post.id] ?? 0;
-
-        return PostTile(
-          post: post,
-          onDelete: () => deletePost(post.id),
-          commentCount: commentCount,
-          onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => PostPage(post: post)),
-            );
-          },
-        );
-      },
-    );
-  }
-
+ 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Home"),
-        bottom: TabBar(
-          controller: _tabController,
-          // ✅ 3 tabs to match TabController length: 3
-          tabs: const [
-            Tab(text: "Create"),
-            Tab(text: "Publish"),
-            Tab(text: "Earn"),
-          ],
-          labelColor: Theme.of(context).colorScheme.inversePrimary,
-          unselectedLabelColor: Theme.of(context).colorScheme.primary,
-        ),
         actions: [
           IconButton(
             onPressed: addPost,
@@ -187,27 +112,46 @@ class _HomePageState extends State<HomePage>
       body: BlocBuilder<PostCubit, PostState>(
         builder: (context, state) {
           if (state is PostsLoaded) {
-            return TabBarView(
-              controller: _tabController,
-              children: [
-                _buildCategoryPosts(
-                    "Create", state.posts, state.commentCounts),
-                _buildCategoryPosts(
-                    "Publish", state.posts, state.commentCounts),
-                _buildCategoryPosts(
-                    "Earn", state.posts, state.commentCounts),
-              ],
+            if (state.posts.isEmpty) {
+              return const Center(child: Text("No posts yet!"));
+            }
+ 
+            return ListView.separated(
+              itemCount: state.posts.length,
+              separatorBuilder: (context, index) => Divider(
+                indent: 16,
+                endIndent: 16,
+                color: Theme.of(context).colorScheme.tertiary,
+              ),
+              itemBuilder: (context, index) {
+                final post = state.posts[index];
+                final commentCount = state.commentCounts[post.id] ?? 0;
+ 
+                return PostTile(
+                  post: post,
+                  onDelete: () => deletePost(post.id),
+                  commentCount: commentCount,
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => PostPage(post: post),
+                      ),
+                    );
+                  },
+                );
+              },
             );
           }
-
+ 
           if (state is PostLoading) {
             return const Center(child: CircularProgressIndicator());
           }
-
+ 
           if (state is PostError) {
             return Center(child: Text(state.message));
           }
-
+ 
           return const SizedBox();
         },
       ),
